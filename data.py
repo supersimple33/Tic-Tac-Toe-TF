@@ -16,7 +16,7 @@ def playGame():
 		# move = random.randint(0, 8)
 		move = random.choice(pmoves)
 		pmoves.remove(move)
-		print(move, end = '')
+		# print(move, end = '')
 		code = b.play(move)
 
 		if code == 1 and not b.pTurn:
@@ -25,7 +25,7 @@ def playGame():
 			return None
 		elif code == 12 and b.pTurn:
 			replay[move] = b.compRead()
-			print(b.normalDisplay())
+			# print(b.normalDisplay())
 			return replay
 		elif code == 0:
 			print("uh oh %d" % move, end = '')
@@ -34,9 +34,13 @@ def playGame():
 
 gameRepo = []
 
-for i in range(10):
-	gameRepo.append(playGame())
+for i in range(100000):
+	g = playGame()
+	if g != None:
+		gameRepo.append(g)
 
+print("Begin Saving")
 with open("tic.json", 'w') as fp:
 	json.dump(gameRepo, fp)
+	print("Saved %d games to json" % len(gameRepo))
 	
