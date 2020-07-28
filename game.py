@@ -5,13 +5,15 @@ class Game:
 		self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]] # -1, 0, 1 will represent x, blanks, and o
 		self.pTurn = False
 	
-	# argument move is between 0-8
+	# argument move is between 0-8. Checks if the move is open/valid.
+	#TODO add extremities HERE
 	def canPlay(self, move):
 		if self.board[move // 3][move % 3] == 0:
 			return True
 		else:
 			return False
 
+	#Displays the board with all the current moves represented by numbers
 	def display(self):
 		i = 0
 		ret = ""
@@ -23,15 +25,26 @@ class Game:
 				ret += '-' * len(line) + "\n"
 		return ret
 	
+	# prints a regular tic tac toe board with xs os and blanks
+	def normalDisplay(self):
+		ret = self.display()
+		ret = ret.replace('-1', 'O')
+		ret = ret.replace('1', 'X')
+		ret = ret.replace('0', ' ')
+		return ret
+	
+	# backend method to obtain data to feed into a trainer returns board as one array
 	def compRead(self):
 		return self.board[0] + self.board[1] + self.board[2]
 	
 	# return code 0 = failed move 1 = move sucess 10-12 = game over and winner announced
 	def play(self, move):
+		#checks if move valid
 		if move < 0 or move > 8:
 			# print("Cant move to %d" % move)
 			return 0
-		if self.canPlay(move):
+		elif self.canPlay(move):
+			#if move is valid flip whos turn it is and add the move to the board
 			self.pTurn = not self.pTurn
 			if self.pTurn:
 				self.board[move // 3][move % 3] = 1
@@ -40,8 +53,10 @@ class Game:
 		else:
 			# print("Cant move to %d" % move)
 			return 0
+		# check if the move resulted in a winner
 		res = self.winner()
 		if res is not None:
+			# print the output of the game
 			if res != 0:
 				print("Game Over " + str(res) + " Won")
 			else:
@@ -49,6 +64,7 @@ class Game:
 			return 11 + res
 		return 1
 	
+	# Checks if there is a winner or tie in the game. returns -1,01
 	def winner(self):
 		for i in range(3):
 			if self.board[i][0] == 0:

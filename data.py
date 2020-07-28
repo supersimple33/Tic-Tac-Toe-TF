@@ -25,6 +25,7 @@ def playGame():
 			return None
 		elif code == 12 and b.pTurn:
 			replay[move] = b.compRead()
+			print(b.normalDisplay())
 			return replay
 		elif code == 0:
 			print("uh oh %d" % move, end = '')
