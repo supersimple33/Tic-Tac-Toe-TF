@@ -23,11 +23,14 @@ class Game:
 				ret += '-' * len(line) + "\n"
 		return ret
 	
-	# returns succ?
+	def compRead(self):
+		return self.board[0] + self.board[1] + self.board[2]
+	
+	# return code 0 = failed move 1 = move sucess 10-12 = game over and winner announced
 	def play(self, move):
 		if move < 0 or move > 8:
-			print("Cant move to %d" % move)
-			return
+			# print("Cant move to %d" % move)
+			return 0
 		if self.canPlay(move):
 			self.pTurn = not self.pTurn
 			if self.pTurn:
@@ -35,10 +38,16 @@ class Game:
 			else:
 				self.board[move // 3][move % 3] = -1
 		else:
-			print("Cant move to %d" % move)
+			# print("Cant move to %d" % move)
+			return 0
 		res = self.winner()
 		if res is not None:
-			print("Game Over " + str(res) + " Won")
+			if res != 0:
+				print("Game Over " + str(res) + " Won")
+			else:
+				print("Tie Game")
+			return 11 + res
+		return 1
 	
 	def winner(self):
 		for i in range(3):
@@ -57,4 +66,7 @@ class Game:
 		if self.board[2][0] == self.board[1][1] and self.board[0][2] == self.board[1][1]:
 			if not self.board[1][1] == 0:
 				return self.board[1][1]
-		return None
+		for i in range(9):
+			if self.canPlay(i):
+				return None
+		return 0
