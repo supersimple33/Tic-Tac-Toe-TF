@@ -34,7 +34,7 @@ def playGame():
 
 gameRepo = []
 
-for i in range(100000):
+for i in range(1000):
 	g = playGame()
 	if g != None:
 		gameRepo.append(g)

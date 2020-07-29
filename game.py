@@ -1,11 +1,7 @@
 # add a header
 
 class Game:
-	def __init__(self):
-		self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]] # -1, 0, 1 will represent x, blanks, and o
-		self.pTurn = False
-	
-	def __init__(self, preBoard, pTurn):
+	def __init__(self, preBoard = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], pTurn = False):
 		self.board = preBoard
 		self.pTurn = pTurn
 	
