@@ -5,6 +5,10 @@ class Game:
 		self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]] # -1, 0, 1 will represent x, blanks, and o
 		self.pTurn = False
 	
+	def __init__(self, preBoard, pTurn):
+		self.board = preBoard
+		self.pTurn = pTurn
+	
 	# argument move is between 0-8. Checks if the move is open/valid.
 	#TODO add extremities HERE
 	def canPlay(self, move):
