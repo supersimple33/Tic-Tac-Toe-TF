@@ -47,12 +47,13 @@ class SmartGame(game.Game):
         newGameObj = copy.deepcopy(gameObj)
         for nextMoveA in newGameObj.possMoves(): # loop through all the possible moves
             codeA = ghostBoardA.play(nextMoveA)
-        if codeA == 10:
-            #we won
-        elif codeA != 1:
-            continue
-        else:
-            refactoredB = 
+            if codeA == 10:
+                #we won
+            elif codeA != 1:
+                continue
+            else:
+                losses += refactoredB(newGameObj)
+        
 
     def refactoredB(game):
 
