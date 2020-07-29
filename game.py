@@ -86,3 +86,11 @@ class Game:
 			if self.canPlay(i):
 				return None
 		return 0
+	
+	# Returns an array of all valid moves
+	def possMoves(self):
+		pMoves = []
+		for i in range(9):
+			if self.canPlay(i):
+				pMoves.append(i)
+		return pMoves
