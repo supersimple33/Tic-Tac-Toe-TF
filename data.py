@@ -9,12 +9,10 @@ import copy
 
 #returns the replay of good moves NONE if unsuccessful
 
-
-generic = game.Game() # this line was added due to a memory issue and should not stay
 def playGame():
 	i = 0
 	replay = {}
-	b = copy.deepcopy(generic)
+	b = game.Game()
 	pmoves = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 	while True: # uh oh the unescable
 		# move = random.randint(0, 8)

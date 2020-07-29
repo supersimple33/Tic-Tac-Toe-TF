@@ -1,9 +1,10 @@
 # add a header
+import copy
 
 class Game:
 	def __init__(self, preBoard = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], pTurn = False):
-		self.board = preBoard
-		self.pTurn = pTurn
+		self.board = copy.deepcopy(preBoard)
+		self.pTurn = copy.deepcopy(pTurn)
 	
 	# argument move is between 0-8. Checks if the move is open/valid.
 	#TODO add extremities HERE
