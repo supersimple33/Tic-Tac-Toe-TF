@@ -40,6 +40,22 @@ class SmartGame(game.Game):
     def __init__(self):
         self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]] # -1, 0, 1 will represent x, blanks, and o
         self.pTurn = False
+    
+    # takes in the game as a argument. Returns how many losses
+    def refactoredA(gameObj):
+        losses = 0
+        newGameObj = copy.deepcopy(gameObj)
+        for nextMoveA in newGameObj.possMoves(): # loop through all the possible moves
+            codeA = ghostBoardA.play(nextMoveA)
+        if codeA == 10:
+            #we won
+        elif codeA != 1:
+            continue
+        else:
+            refactoredB = 
+
+    def refactoredB(game):
+
 
 b = SmartGame()
 print(b.normalDisplay())
