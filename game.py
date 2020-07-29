@@ -94,3 +94,7 @@ class Game:
 			if self.canPlay(i):
 				pMoves.append(i)
 		return pMoves
+	
+	def __del__(self):
+		del self.board
+		del self.pTurn

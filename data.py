@@ -1,21 +1,24 @@
 import game
 import json
 import random
+import copy
 
 #only train when a game results in a win will start with going first
 #two diff model one for first one for second maybe?
 #SWITCH TO PICKLE after debugging
 
 #returns the replay of good moves NONE if unsuccessful
+
+
+generic = game.Game() # this line was added due to a memory issue and should not stay
 def playGame():
 	i = 0
 	replay = {}
-	b = game.Game()
+	b = copy.deepcopy(generic)
 	pmoves = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 	while True: # uh oh the unescable
 		# move = random.randint(0, 8)
 		move = random.choice(pmoves)
-		pmoves.remove(move)
 		# print(move, end = '')
 		code = b.play(move)
 
@@ -23,7 +26,7 @@ def playGame():
 			replay[move] = b.compRead()
 		elif code == 10 or code == 11:
 			return None
-		elif code == 12 and b.pTurn:
+		elif code == 12:
 			replay[move] = b.compRead()
 			# print(b.normalDisplay())
 			return replay
@@ -31,16 +34,20 @@ def playGame():
 			print("uh oh %d" % move, end = '')
 
 		i += 1
+		pmoves.remove(move)
+	del b
 
 gameRepo = []
 
-for i in range(1000):
+for i in range(10000):
 	g = playGame()
 	if g != None:
-		gameRepo.append(g)
+		for gameState in g.items():
+			formedReplay = {"move" : gameState[0], "0s": gameState[1][0], "1s": gameState[1][1], "2s": gameState[1][2], "3s": gameState[1][3], "4s": gameState[1][4], "5s": gameState[1][5], "6s": gameState[1][6], "7s": gameState[1][7], "8s": gameState[1][8]}
+			gameRepo.append(formedReplay)
 
 print("Begin Saving")
 with open("tic.json", 'w') as fp:
 	json.dump(gameRepo, fp)
-	print("Saved %d games to json" % len(gameRepo))
+	print("Saved %d moves to json" % len(gameRepo))
 	
