@@ -19,19 +19,20 @@ class SmartGame(game.Game):
             elif codeA != 1:
                 continue
             else:
-                for nextMoveB in ghostBoardA.possMoves():
-                    ghostBoardB = copy.deepcopy(ghostBoardA)
-                    codeB = ghostBoardB.play(nextMoveB)
-                    if codeB == 12: # if we lose then add one to this move sets lose number and move to the next game
-                        losses += 1
-                        continue
-                    elif codeB != 1:
-                        continue
-                    else:
-                        f = 1 # placeholder repeat all of ghostBoardA as ghostBoardC
-                        #
-                        # 
-                        #
+                losses += refactoredB(ghostBoardA)
+                # for nextMoveB in ghostBoardA.possMoves():
+                #     ghostBoardB = copy.deepcopy(ghostBoardA)
+                #     codeB = ghostBoardB.play(nextMoveB)
+                #     if codeB == 12: # if we lose then add one to this move sets lose number and move to the next game
+                #         losses += 1
+                #         continue
+                #     elif codeB != 1:
+                #         continue
+                #     else:
+                #         f = 1 # placeholder repeat all of ghostBoardA as ghostBoardC
+                #         #
+                #         # 
+                #         #
             moveRepo[nextMoveA] = losses
 
         bestMove = min(moveRepo.items(), key=lambda x: x[1])[0]
@@ -53,6 +54,7 @@ class SmartGame(game.Game):
                 continue
             else:
                 losses += refactoredB(newGameObj)
+        return losses
         
 
     def refactoredB(game):
