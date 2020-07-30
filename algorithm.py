@@ -4,6 +4,34 @@ import copy
 # import sys
 
 # A subclass of game that has an added method for making the best/smartest move
+
+def refactoredA(gameObj):
+        losses = 0
+        for nextMoveA in gameObj.possMoves(): # loop through all the possible moves
+            newGameObj = copy.deepcopy(gameObj)
+            codeA = newGameObj.play(nextMoveA)
+            if codeA == 10:
+                continue
+            elif codeA != 1:
+                continue
+            else:
+                losses += refactoredB(newGameObj)
+        return losses
+
+def refactoredB(ghostBoardA):
+        losses = 0
+        for nextMoveB in ghostBoardA.possMoves():
+            ghostBoardB = copy.deepcopy(ghostBoardA)
+            codeB = ghostBoardB.play(nextMoveB)
+            if codeB == 12: 
+                losses += 1
+                continue
+            elif codeB != 1:
+                continue
+            else:
+                losses += refactoredA(ghostBoardB)
+        return losses
+
 class SmartGame(game.Game):
     def smartMove(self):
         moveRepo = {}
@@ -43,21 +71,6 @@ class SmartGame(game.Game):
         self.pTurn = False
     
     # takes in the game as a argument. Returns how many losses
-    def refactoredA(gameObj):
-        losses = 0
-        newGameObj = copy.deepcopy(gameObj)
-        for nextMoveA in newGameObj.possMoves(): # loop through all the possible moves
-            codeA = ghostBoardA.play(nextMoveA)
-            if codeA == 10:
-                #we won
-            elif codeA != 1:
-                continue
-            else:
-                losses += refactoredB(newGameObj)
-        return losses
-        
-
-    def refactoredB(game):
 
 
 b = SmartGame()
@@ -66,11 +79,17 @@ b.play(1)
 print(b.normalDisplay())
 b.smartMove()
 print(b.normalDisplay())
-b.play(2)
+b.play(0)
 print(b.normalDisplay())
 b.smartMove()
 print(b.normalDisplay())
-b.play(4)
+b.play(6)
 print(b.normalDisplay())
 b.smartMove()
+print(b.normalDisplay())
+b.play(5)
+print(b.normalDisplay())
+b.smartMove()
+print(b.normalDisplay())
+b.play(8)
 print(b.normalDisplay())
