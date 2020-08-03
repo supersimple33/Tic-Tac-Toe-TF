@@ -59,9 +59,11 @@ class Game:
 		if res is not None:
 			# print the output of the game
 			if res != 0:
-				print("Game Over " + str(res) + " Won")
+				# print("Game Over " + str(res) + " Won")
+				pass
 			else:
-				print("Tie Game")
+				# print("Tie Game")
+				pass
 			return 11 + res
 		return 1
 	

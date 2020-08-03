@@ -38,22 +38,28 @@ def playGame():
 
 gameRepo = pd.DataFrame(columns=['move', "0s", "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s"])
 
-for i in range(20000):
+for i in range(10):
 	g = playGame()
 	if g != None:
 		for gameState in g.items():
 			formedReplay = {"move" : gameState[0], "0s": gameState[1][0], "1s": gameState[1][1], "2s": gameState[1][2], "3s": gameState[1][3], "4s": gameState[1][4], "5s": gameState[1][5], "6s": gameState[1][6], "7s": gameState[1][7], "8s": gameState[1][8]}
 			# formedReplay = [gameState[0], gameState[1][0], gameState[1][1], gameState[1][2], gameState[1][3], gameState[1][4], gameState[1][5], gameState[1][6], gameState[1][7], gameState[1][8]}
 			gameRepo = gameRepo.append(formedReplay, ignore_index=True)
-
-print(gameRepo)
+	if i % 1000 == 0:
+		print(i)
 
 print("Begin Saving")
 # with open("tic.json", 'w') as fp:
 # 	json.dump(gameRepo, fp)
 # 	print("Saved %d moves to json" % len(gameRepo))
 
+gameRepo.drop_duplicates(subset = ["0s", "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s"], keep = 'first', inplace = True)
+print(gameRepo)
+
+# pd.sort_values("move", inplace=True)
+
 with open("result.csv", 'w') as fp:
 	gameRepo.to_csv(fp, index=False)
-	print("Saved %d moves to csv" % gameRepo.size)
-	
+	print("Saved %d moves to csv" % (gameRepo.size // 10))
+
+# 13300 at 1000

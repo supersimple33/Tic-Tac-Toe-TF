@@ -24,11 +24,11 @@ print(dataset)
 #     print(x,y)
 
 def get_compiled_model():
-    model = tf.keras.Sequential([tf.keras.layers.Dense(5, activation='relu'),tf.keras.layers.Dense(3, activation='relu'),tf.keras.layers.Dense(9)])
-    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+    model = tf.keras.Sequential([tf.keras.layers.Dense(15, activation='relu', input_shape=(9, )),tf.keras.layers.Dense(20, activation='relu'),tf.keras.layers.Dense(15, activation='relu'),tf.keras.layers.Dense(9)])
+    model.compile(optimizer='rmsprop', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
     return model
 
 model = get_compiled_model()
-model.fit(train_dataset, epochs=5)
+model.fit(train_dataset, epochs=30)
 model.save('saved_model/my_model')
 print(model.summary())
