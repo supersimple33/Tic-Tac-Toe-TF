@@ -38,7 +38,7 @@ def playGame():
 
 gameRepo = pd.DataFrame(columns=['move', "0o", "1o", "2o", "3o", "4o", "5o", "6o", "7o", "8o", "0e", "1e", "2e", "3e", "4e", "5e", "6e", "7e", "8e", "0x", "1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x"])
 
-for i in range(10):
+for i in range(5000):
 	g = playGame()
 	if g != None:
 		for gameState in g.items():
@@ -53,7 +53,7 @@ print("Begin Saving")
 # 	json.dump(gameRepo, fp)
 # 	print("Saved %d moves to json" % len(gameRepo))
 
-gameRepo.drop_duplicates(subset = ["0o", "1o", "2o", "3o", "4o", "5o", "6o", "7o", "8o", "0e", "1e", "2e", "3e", "4e", "5e", "6e", "7e", "8e", "0x", "1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x"], keep = 'first', inplace = True)
+# gameRepo.drop_duplicates(subset = ["0o", "1o", "2o", "3o", "4o", "5o", "6o", "7o", "8o", "0e", "1e", "2e", "3e", "4e", "5e", "6e", "7e", "8e", "0x", "1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x"], keep = 'first', inplace = True)
 print(gameRepo)
 
 # pd.sort_values("move", inplace=True)

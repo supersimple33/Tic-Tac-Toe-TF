@@ -25,7 +25,7 @@ print(dataset)
 
 def get_compiled_model():
     model = tf.keras.Sequential([tf.keras.layers.Dense(21, activation='relu', input_shape=(27, )),tf.keras.layers.Dense(15, activation='relu'),tf.keras.layers.Dense(9)])#tf.keras.layers.Dense(15, activation='relu')
-    model.compile(optimizer='rmsprop', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])#rmsprop
     return model
 
 model = get_compiled_model()
