@@ -101,3 +101,7 @@ class Game:
 	def __del__(self):
 		del self.board
 		del self.pTurn
+
+	# returns a unique string linked to the current board state
+	def getHash(self):
+		return str(self.compRead())

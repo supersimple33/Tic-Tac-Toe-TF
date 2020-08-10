@@ -48,19 +48,6 @@ class SmartGame(game.Game):
                 continue
             else:
                 losses += refactoredB(ghostBoardA)
-                # for nextMoveB in ghostBoardA.possMoves():
-                #     ghostBoardB = copy.deepcopy(ghostBoardA)
-                #     codeB = ghostBoardB.play(nextMoveB)
-                #     if codeB == 12: # if we lose then add one to this move sets lose number and move to the next game
-                #         losses += 1
-                #         continue
-                #     elif codeB != 1:
-                #         continue
-                #     else:
-                #         f = 1 # placeholder repeat all of ghostBoardA as ghostBoardC
-                #         #
-                #         # 
-                #         #
             moveRepo[nextMoveA] = losses
 
         bestMove = min(moveRepo.items(), key=lambda x: x[1])[0]
@@ -69,7 +56,6 @@ class SmartGame(game.Game):
     def __init__(self):
         self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]] # -1, 0, 1 will represent x, blanks, and o
         self.pTurn = False
-    
     # takes in the game as a argument. Returns how many losses
 
 
