@@ -1,23 +1,25 @@
-import tensorflow as tf
-import numpy as np
+# import tensorflow as tf
+# import numpy as np
 import pickle
 import game
 import random
 import copy
 import sys
+import time
 
 class SuperGame():
     def __init__(self, exp_rate=0.3):
         # ML Tweak Vars
         self.exp_rate = exp_rate
-        self.lr = 0.4
-        self.decay_gamma = 0.4
+        self.lr = 0.15
+        self.decay_gamma = 0.7
         # State Saving
         self.states_value1 = {}
         self.states_value2 = {}
         self.states1 = []  # record all positions taken
         self.states2 = []
         self.cg = None
+    
     def makeMove(self):
         if random.uniform(0,1) <= self.exp_rate:
             action = random.choice(self.cg.possMoves())
@@ -40,60 +42,81 @@ class SuperGame():
         return action
 
     def trainPlay(self, r=20000):
-            for i in range(r):
-                self.cg = game.Game()
-                esc = False
-                if i % 1000 == 0:
-                    print("Rounds {}".format(i))
-                while not esc: # isEnd?
-                    # Player 1
-                    # positions = g.possMoves()
-                    # Make A Move
-                    p1_action = self.makeMove()
+        curr = time.time()
+        ties = 0
+        aWins = 0
+        bWins = 0
+        for i in range(r):
+            self.cg = game.Game()
+            esc = False
+            if i % 1000 == 0:
+                print("Rounds {} ties percent {}, aw {}, bw {}, durr {}".format(i, ties / 10, aWins / 10, bWins / 10, time.time() - curr))
+                ties = 0
+                aWins = 0
+                bWins = 0
+                curr = time.time()
+            while not esc: # isEnd?
+                # Player 1
+                # positions = g.possMoves()
+                # Make A Move
+                p1_action = self.makeMove()
 
-                    # Add board state
+                # Add board state
+                hashBrown = self.cg.getHash()
+                self.states1.append(hashBrown)
+                # check board status if it is end
+
+                win = self.cg.winner()
+                if win is not None:
+                    # self.showBoard()
+                    # ended with p1 either win or draw
+                    if win == 0:
+                        ties += 1
+                    else:
+                        aWins += 1
+
+                    self.feedReward()
+                    # self.p1.reset()
+                    # self.p2.reset()
+                    esc = True
+                    self.states1 = []
+                    self.states2 = []
+                    break
+                else:
+                    # Player 2
+                    # Make a move
+                    p2_action = self.makeMove()
+
+                    # Adds new state
                     hashBrown = self.cg.getHash()
-                    self.states1.append(hashBrown)
-                    # check board status if it is end
+                    self.states2.append(hashBrown)
 
                     win = self.cg.winner()
                     if win is not None:
                         # self.showBoard()
-                        # ended with p1 either win or draw
+                        # ended with p2 either win or draw
+                        if win == 0:
+                            ties += 1
+                        else:
+                            bWins += 1
                         self.feedReward()
-                        # self.p1.reset()
-                        # self.p2.reset()
                         esc = True
+                        self.states1 = []
+                        self.states2 = []
                         break
-                    else:
-                        # Player 2
-                        # Make a move
-                        p2_action = self.makeMove()
-
-                        # Adds new state
-                        hashBrown = self.cg.getHash()
-                        self.states2.append(hashBrown)
-
-                        win = self.cg.winner()
-                        if win is not None:
-                            # self.showBoard()
-                            # ended with p2 either win or draw
-                            self.feedReward()
-                            esc = True
-                            break
 
     def feedReward(self):
         result = self.cg.winner()
         # backpropagate reward
         if result == 1:
-            rewardA = 1
-            rewardB = 0
+            rewardA = 1.5
+            rewardB = -1.5
         elif result == -1:
-            rewardA = 0
-            rewardB = 1
+            rewardA = -1.5
+            rewardB = 1.5
         elif result == 0:
-            rewardA = 0.1
-            rewardB = 0.5
+            rewardA = 0.0
+            rewardB = 0.0
         else:
             sys.exit(1)
 
@@ -121,23 +144,47 @@ class SuperGame():
         print("Start Loading")
         with open("table1", 'rb') as fp:
             self.states_value1 = pickle.load(fp)
+            print("Finished loading 1")
         with open("table2", 'rb') as fp:
             self.states_value2 = pickle.load(fp)
-            print("Finished loading")
+            print("Finished loading 2")
     
     def versus(self):
         self.cg = game.Game()
         while self.cg.winner() is None:
             if self.cg.pTurn:
-                move = int(input("Where would you like to go: "))
+                # print('b')
+                # self.cg.play(0)
+                inp = input("Where would you like to go: ")
+                # print(inp)
+                move = int(inp)
                 self.cg.play(move)
+                # print('c')
             else:
                 self.makeMove()
+                # print('a')
             print(self.cg.normalDisplay())
+    
+    def dataBase(self):
+        # print(self.states_value1.keys())
+        for keyPair in self.states_value1.items():
+            hb = eval(keyPair[0])
+            nug = game.Game(preBoard = [[hb[0], hb[1], hb[2]], [hb[3], hb[4], hb[5]], [hb[6], hb[7], hb[8]]])
+            print(nug.display())
 
-diablo = SuperGame(0.01)
-diablo.load()
-# diablo.trainPlay()
+# diablo = SuperGame(0.35)
+# diablo.load()
+# diablo.trainPlay(50000)
 # diablo.save()
-diablo.versus()
 
+# diablo = SuperGame(0.001)
+# diablo.load()
+# diablo.versus()
+
+diablo = SuperGame(0.001)
+diablo.load()
+diablo.dataBase()
+
+# diablo = SuperGame(0.1)
+# diablo.load()
+# diablo.trainPlay(5000)

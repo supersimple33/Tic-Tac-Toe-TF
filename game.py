@@ -29,7 +29,7 @@ class Game:
 	# prints a regular tic tac toe board with xs os and blanks
 	def normalDisplay(self):
 		ret = self.display()
-		ret = ret.replace('-1', 'O')
+		ret = ret.replace('-1', 'O ')
 		ret = ret.replace('1', 'X')
 		ret = ret.replace('0', ' ')
 		return ret
