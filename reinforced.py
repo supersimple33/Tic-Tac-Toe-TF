@@ -167,10 +167,19 @@ class SuperGame():
     
     def dataBase(self):
         # print(self.states_value1.keys())
+        red = ""
         for keyPair in self.states_value1.items():
             hb = eval(keyPair[0])
             nug = game.Game(preBoard = [[hb[0], hb[1], hb[2]], [hb[3], hb[4], hb[5]], [hb[6], hb[7], hb[8]]])
-            print(nug.display())
+            # print(nug.normalDisplay())
+            # print(round(keyPair[1],11))
+            # print()
+            red += nug.normalDisplay() + "\n" + str(round(keyPair[1],8)) + "\n" + "\n"
+        print("start red save")
+        with open("dataBase", 'w') as fp:
+            fp.write(red)
+            print("finished red save")
+
 
 # diablo = SuperGame(0.35)
 # diablo.load()
