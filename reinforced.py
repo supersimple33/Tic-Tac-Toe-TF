@@ -7,7 +7,7 @@ import copy
 import sys
 import time
 
-class SuperGame():
+class SuperGame:
     def __init__(self, exp_rate=0.3):
         # ML Tweak Vars
         self.exp_rate = exp_rate
@@ -152,7 +152,7 @@ class SuperGame():
     def versus(self):
         self.cg = game.Game()
         while self.cg.winner() is None:
-            if self.cg.pTurn:
+            if not self.cg.pTurn:
                 # print('b')
                 # self.cg.play(0)
                 inp = input("Where would you like to go: ")
@@ -181,18 +181,18 @@ class SuperGame():
             print("finished red save")
 
 
-# diablo = SuperGame(0.35)
+# diablo = SuperGame(0.3)
 # diablo.load()
-# diablo.trainPlay(50000)
+# diablo.trainPlay(100000)
 # diablo.save()
-
-# diablo = SuperGame(0.001)
-# diablo.load()
-# diablo.versus()
 
 diablo = SuperGame(0.001)
 diablo.load()
-diablo.dataBase()
+diablo.versus()
+
+# diablo = SuperGame(0.001)
+# diablo.load()
+# diablo.dataBase()
 
 # diablo = SuperGame(0.1)
 # diablo.load()
