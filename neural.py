@@ -6,8 +6,7 @@ import game
 # This subclass is being forgotten as I could not create a classifier that would not repeat the moves I was making however it did apparently have a 50% accuracy but that was unseen in testing
 class NeuralGame(game.Game):
     def neuralMove(self):
-        state = self.compRead()
-        predSet  = [state[0] == -1, state[1] == -1, state[2] == -1, state[3] == -1, state[4] == -1, state[5] == -1, state[6] == -1, state[7] == -1, state[8] == -1, state[0] == 0, state[1] == 0, state[2] == 0, state[3] == 0, state[4] == 0, state[5] == 0, state[6] == 0, state[7] == 0, state[8] == 0, state[0] == 1, state[1] == 1, state[2] == 1, state[3] == 1, state[4] == 1, state[5] == 1, state[6] == 1, state[7] == 1, state[8] == 1]
+        predSet = self.binRead()
         prediction = self.model.predict([predSet])
         print(prediction.shape)
         print(prediction)

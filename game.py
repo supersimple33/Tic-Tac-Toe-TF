@@ -38,6 +38,10 @@ class Game:
 	def compRead(self):
 		return self.board[0] + self.board[1] + self.board[2]
 	
+	def binRead(self):
+		state = self.compRead()
+		return [state[0] == -1, state[1] == -1, state[2] == -1, state[3] == -1, state[4] == -1, state[5] == -1, state[6] == -1, state[7] == -1, state[8] == -1, state[0] == 0, state[1] == 0, state[2] == 0, state[3] == 0, state[4] == 0, state[5] == 0, state[6] == 0, state[7] == 0, state[8] == 0, state[0] == 1, state[1] == 1, state[2] == 1, state[3] == 1, state[4] == 1, state[5] == 1, state[6] == 1, state[7] == 1, state[8] == 1]
+	
 	# return code 0 = failed move 1 = move sucess 10-12 = game over and winner announced
 	def play(self, move):
 		#checks if move valid
