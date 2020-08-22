@@ -39,7 +39,7 @@ class NeuralTic(): # my class # is () necessary/what does it do
 
     def backProp(self, position, moveInd, target_value):
         output = self.model.predict([binConv(position)])
-        target = copy.deepcopy(output)[0]
+        target = copy.copy(output)[0] # switched to regular instead of deepcopy may cause mem errors
         target[moveInd] = target_value
         illegal_moves = []
         [illegal_moves.append(x) for x in [0,1,2,3,4,5,6,7,8] if position[x] != 0]
