@@ -63,13 +63,18 @@ class NeuralTic(): # my class # is () necessary/what does it do
                 if self.cg.pTurn:
                     indexMove = self.neurMove()
                     moveTracker.appendleft((self.cg.compRead(), indexMove))
+                    print(len(moveTracker))
                 else:
                     # Random availible for now but should maybe switch to q learner later
                     indexMove = random.choice(self.cg.possMoves())
-                self.cg.play(indexMove)
+                ret = self.cg.play(indexMove)
+                if ret == 0:
+                    break
             # reward = 0.0
             win = self.cg.winner()
-            if win == 1: #rewards should be tweaked later
+            if win == None:
+                reward = 0.0
+            elif win == 1: #rewards should be tweaked later
                 reward = 1.0
                 wins += 1
             elif win ==  -1:
@@ -91,11 +96,14 @@ class NeuralTic(): # my class # is () necessary/what does it do
             
             # moving training along
             if (gameInd+1) % (numGames / 20) == 0:
-                self.epsilon = max(0, self.epsilon - 0.05) # could also update discount factor # no epsilon change in training
                 print(f"{gameInd+1}/{numGames} games, win/tie percent={(wins * 20) / numGames},{(ties * 20) / numGames} using epsilon={round(self.epsilon,2)}...operations completed in {time.time() - curr}")
+                self.epsilon = max(0, self.epsilon - 0.05) # could also update discount factor # no epsilon change in training
                 wins = 0
                 ties = 0
                 curr = time.time()
+    def record(self):
+        self.model.save('saved_model/my_model')
 
 trainStation = NeuralTic()
 trainStation.startTrain(20000)
+trainStation.record()
