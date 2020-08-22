@@ -73,7 +73,7 @@ class Game:
 			return 11 + res
 		return 1
 	
-	def updateWinner():
+	def updateWinner(self):
 		for i in range(3):
 			if self.board[i][0] == 0:
 				continue

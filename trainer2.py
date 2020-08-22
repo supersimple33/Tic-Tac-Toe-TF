@@ -55,6 +55,7 @@ class NeuralTic(): # my class # is () necessary/what does it do
     def startTrain(self, numGames = 20000): # my method
         wins = 0
         ties = 0
+        misses = 0
         curr = time.time()
         for gameInd in range(numGames):
             self.cg = game.Game()
@@ -73,6 +74,7 @@ class NeuralTic(): # my class # is () necessary/what does it do
             win = self.cg.winner()
             if win == None:
                 reward = 0.0
+                misses += 1
             elif win == 1: #rewards should be tweaked later
                 reward = 1.0
                 wins += 1
@@ -95,10 +97,11 @@ class NeuralTic(): # my class # is () necessary/what does it do
             
             # moving training along
             if (gameInd+1) % (numGames / 20) == 0:
-                print(f"{gameInd+1}/{numGames} games, win/tie percent={(wins * 20) / numGames},{(ties * 20) / numGames} using epsilon={round(self.epsilon,2)}...operations completed in {time.time() - curr}")
+                print(f"{gameInd+1}/{numGames} games, win/tie/misses percent={(wins * 20) / numGames},{(ties * 20) / numGames},{(misses * 20) / numGames} using epsilon={round(self.epsilon,2)}...operations completed in {time.time() - curr}")
                 self.epsilon = max(0, self.epsilon - 0.05) # could also update discount factor # no epsilon change in training
                 wins = 0
                 ties = 0
+                misses = 0
                 curr = time.time()
     def record(self):
         self.model.save('saved_model/my_model')
