@@ -22,7 +22,7 @@ class NeuralTic(): # my class # is () necessary/what does it do
             tf.keras.layers.Dense(36, activation='relu'),
             tf.keras.layers.Dense(9, activation='sigmoid') #softmax alternate
         ])
-        self.opt = tf.keras.optimizers.SGD(learning_rate=0.2, name='SGD')
+        self.opt = tf.keras.optimizers.SGD(learning_rate=0.15, name='SGD')
 
         self.epsilon = epsilon
         self.discountFac = discountFac
