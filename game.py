@@ -5,6 +5,7 @@ class Game:
 	def __init__(self, preBoard = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], pTurn = False):
 		self.board = copy.deepcopy(preBoard)
 		self.pTurn = copy.deepcopy(pTurn)
+		self.lastWinCheck = None
 	
 	# argument move is between 0-8. Checks if the move is open/valid.
 	#TODO add extremities HERE
@@ -59,20 +60,20 @@ class Game:
 			# print("Cant move to %d" % move)
 			return 0
 		# check if the move resulted in a winner
-		res = self.winner()
+		res = self.updateWinner()
+		self.lastWinCheck = res
 		if res is not None:
 			# print the output of the game
-			if res != 0:
-				# print("Game Over " + str(res) + " Won")
-				pass
-			else:
-				# print("Tie Game")
-				pass
+			# if res != 0:
+			# 	# print("Game Over " + str(res) + " Won")
+			# 	pass
+			# else:
+			# 	# print("Tie Game")
+			# 	pass
 			return 11 + res
 		return 1
 	
-	# Checks if there is a winner or tie in the game. returns -1,01
-	def winner(self):
+	def updateWinner():
 		for i in range(3):
 			if self.board[i][0] == 0:
 				continue
@@ -93,6 +94,10 @@ class Game:
 			if self.canPlay(i):
 				return None
 		return 0
+	
+	# Checks if there is a winner or tie in the game. returns -1,01
+	def winner(self):
+		return self.lastWinCheck
 	
 	# Returns an array of all valid moves
 	def possMoves(self):

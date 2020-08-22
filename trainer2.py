@@ -22,7 +22,7 @@ class NeuralTic(): # my class # is () necessary/what does it do
             tf.keras.layers.Dense(36, activation='relu'),
             tf.keras.layers.Dense(9, activation='sigmoid') #softmax alternate
         ])
-        self.opt = tf.keras.optimizers.SGD(learning_rate=0.1, name='SGD')
+        self.opt = tf.keras.optimizers.SGD(learning_rate=0.2, name='SGD')
 
         self.epsilon = epsilon
         self.discountFac = discountFac
@@ -63,7 +63,6 @@ class NeuralTic(): # my class # is () necessary/what does it do
                 if self.cg.pTurn:
                     indexMove = self.neurMove()
                     moveTracker.appendleft((self.cg.compRead(), indexMove))
-                    print(len(moveTracker))
                 else:
                     # Random availible for now but should maybe switch to q learner later
                     indexMove = random.choice(self.cg.possMoves())
@@ -105,5 +104,5 @@ class NeuralTic(): # my class # is () necessary/what does it do
         self.model.save('saved_model/my_model')
 
 trainStation = NeuralTic()
-trainStation.startTrain(20000)
+trainStation.startTrain(2000)
 trainStation.record()
