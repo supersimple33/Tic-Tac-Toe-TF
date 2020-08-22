@@ -160,7 +160,7 @@ def update_training_gameover(net_context, move_history, q_learning_player,
 
         next_position = position
 
-    net_context.target_net.load_state_dict(net_context.policy_net.state_dict())
+    net_context.target_net.load_state_dict(net_context.policy_net.state_dict()) # refreshes models
 
 
 def backpropagate(net_context, position, move_index, target_value):
