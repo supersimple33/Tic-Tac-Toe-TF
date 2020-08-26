@@ -22,7 +22,7 @@ class NeuralTic(): # my class # is () necessary/what does it do
             tf.keras.layers.Dense(36, activation='relu'),
             tf.keras.layers.Dense(9, activation='sigmoid') #softmax alternate
         ])
-        self.opt = tf.keras.optimizers.SGD(learning_rate=0.15, name='SGD')
+        self.opt = tf.keras.optimizers.SGD(learning_rate=0.1, name='SGD')
 
         self.epsilon = epsilon
         self.discountFac = discountFac
@@ -47,16 +47,18 @@ class NeuralTic(): # my class # is () necessary/what does it do
             target[mi] = 0.0
         with tf.GradientTape() as tape:
             loss = tf.keras.losses.mean_squared_error(target, output)
-            grads = tape.gradient(loss, self.model.trainable_variables) # linking?
-            grads = [grad if grad is not None else tf.zeros_like(var) for var, grad in zip(self.model.trainable_variables, grads)] # silencer?
+        grads = tape.gradient(loss, self.model.trainable_variables) # linking?
+        # grads = [grad if grad is not None else tf.zeros_like(var) for var, grad in zip(self.model.trainable_variables, grads)] # silencer?
 
-            self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
+        self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
+        return loss
 
     def startTrain(self, numGames = 20000): # my method
         wins = 0
         ties = 0
         misses = 0
         curr = time.time()
+        avgLoss = tf.keras.metrics.Mean()
         for gameInd in range(numGames):
             self.cg = game.Game()
             moveTracker = deque()
@@ -88,24 +90,30 @@ class NeuralTic(): # my class # is () necessary/what does it do
             targModel = tf.keras.models.clone_model(self.model) # should be fine to not reset the target model at the end
 
             next_position, move_index = moveTracker[0]
-            self.backProp(next_position, move_index, reward)
+            loss = self.backProp(next_position, move_index, reward)
+            avgLoss.update_state(loss)
             for (position, move_index) in list(moveTracker)[1:] :
                 output = targModel.predict([binConv(next_position)]) # position should hold same formatting as binRead post conversion
                 qValue = tf.reduce_max(output) # what was the q value of the last move
-                self.backProp(position, move_index, qValue * self.discountFac)
+                loss = self.backProp(position, move_index, qValue * self.discountFac)
+                avgLoss.update_state(loss)
+
                 next_position = position
+            
             
             # moving training along
             if (gameInd+1) % (numGames / 20) == 0:
-                print(f"{gameInd+1}/{numGames} games, win/tie/misses percent={(wins * 20) / numGames},{(ties * 20) / numGames},{(misses * 20) / numGames} using epsilon={round(self.epsilon,2)}...operations completed in {time.time() - curr}")
+                print(f"{gameInd+1}/{numGames} games, win/tie/miss percent={(wins * 20) / numGames},{(ties * 20) / numGames},{(misses * 20) / numGames} epsilon={round(self.epsilon,2)}...completed in {round(time.time() - curr, 3)}s, L={round(avgLoss.result().numpy(), 5)}")
                 self.epsilon = max(0, self.epsilon - 0.05) # could also update discount factor # no epsilon change in training
                 wins = 0
                 ties = 0
                 misses = 0
                 curr = time.time()
+                avgLoss.reset_states()
+
     def record(self):
         self.model.save('saved_model/my_model')
 
 trainStation = NeuralTic()
-trainStation.startTrain(2000)
+trainStation.startTrain(1000)
 trainStation.record()
