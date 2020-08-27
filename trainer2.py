@@ -132,7 +132,7 @@ class NeuralTic(): # my class # is () necessary/what does it do
             if win == None:
                 reward = 0.0
                 misses += 1
-            elif win == 1: #rewards should be tweaked later
+            elif win == 1: #reward should be tweaked later
                 reward = 1.0
                 wins += 1
             elif win ==  -1:
