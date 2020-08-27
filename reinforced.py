@@ -25,7 +25,7 @@ class SuperGame:
             action = random.choice(self.cg.possMoves())
         else:
             value_max = -999 #int.min insteadd?
-            for p in self.cg.possMoves():
+            for p in self.cg.possMoves(): # loop through every possible move and obtain their q value if there is one
                 nextGame = copy.deepcopy(self.cg)
                 nextGame.play(p)
                 hashBrown = nextGame.getHash()
@@ -33,23 +33,23 @@ class SuperGame:
                     value = 0 if self.states_value2.get(hashBrown) is None else self.states_value2.get(hashBrown)
                 else:
                     value = 0 if self.states_value1.get(hashBrown) is None else self.states_value1.get(hashBrown)
-                if value >= value_max:
+                if value >= value_max: # choose the greates q_value and play it
                     value_max = value
                     action = p
-            # print(value_max)
-        # print("I think " + str(action))
         self.cg.play(action)
         return action
 
     def trainPlay(self, r=20000):
-        curr = time.time()
+        # Stats For Tracking Progress
+        curr = time.time() # track how long training takes
         ties = 0
         aWins = 0
         bWins = 0
+
         for i in range(r):
-            self.cg = game.Game()
+            self.cg = game.Game() # init a new game for each epoch
             esc = False
-            if i % 1000 == 0:
+            if i % 1000 == 0: # update stats every 1000 games
                 print("Rounds {} ties percent {}, aw {}, bw {}, durr {}".format(i, ties / 10, aWins / 10, bWins / 10, time.time() - curr))
                 ties = 0
                 aWins = 0
@@ -57,27 +57,26 @@ class SuperGame:
                 curr = time.time()
             while not esc: # isEnd?
                 # Player 1
-                # positions = g.possMoves()
                 # Make A Move
                 p1_action = self.makeMove()
 
                 # Add board state
                 hashBrown = self.cg.getHash()
                 self.states1.append(hashBrown)
-                # check board status if it is end
 
+                # check if board status is an end state
                 win = self.cg.winner()
                 if win is not None:
-                    # self.showBoard()
-                    # ended with p1 either win or draw
+                    # if ended with p1 either win or draw no other checks needed
                     if win == 0:
                         ties += 1
                     else:
                         aWins += 1
 
+                    # Update Q Tabular Sheet
                     self.feedReward()
-                    # self.p1.reset()
-                    # self.p2.reset()
+
+                    # exit this epoch and reset
                     esc = True
                     self.states1 = []
                     self.states2 = []
@@ -94,12 +93,14 @@ class SuperGame:
                     win = self.cg.winner()
                     if win is not None:
                         # self.showBoard()
-                        # ended with p2 either win or draw
+                        # ended with p2 either win or draw no other checks needed
                         if win == 0:
                             ties += 1
                         else:
                             bWins += 1
+                        # Update Q Tabular Sheet
                         self.feedReward()
+
                         esc = True
                         self.states1 = []
                         self.states2 = []
@@ -107,19 +108,20 @@ class SuperGame:
 
     def feedReward(self):
         result = self.cg.winner()
-        # backpropagate reward
+        # determine reward for each based off of result
         if result == 1:
-            rewardA = 1.5
-            rewardB = -1.5
+            rewardA = 1.0
+            rewardB = -1.0
         elif result == -1:
-            rewardA = -1.5
-            rewardB = 1.5
+            rewardA = -1.0
+            rewardB = 1.0
         elif result == 0:
             rewardA = 0.0
             rewardB = 0.0
         else:
             sys.exit(1)
 
+        # Add in the reward by updating the q value using a traditional function for updating one
         for st in reversed(self.states1):
             if self.states_value1.get(st) is None:
                 self.states_value1[st] = 0
@@ -149,17 +151,14 @@ class SuperGame:
             self.states_value2 = pickle.load(fp)
             print("Finished loading 2")
     
-    def versus(self):
+    def versus(self): # play a HumanReadable game
         self.cg = game.Game()
         while self.cg.winner() is None:
             if not self.cg.pTurn:
-                # print('b')
-                # self.cg.play(0)
                 inp = input("Where would you like to go: ")
-                # print(inp)
+
                 move = int(inp)
                 self.cg.play(move)
-                # print('c')
             else:
                 self.makeMove()
                 # print('a')

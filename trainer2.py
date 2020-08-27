@@ -75,60 +75,61 @@ class NeuralTic(): # my class # is () necessary/what does it do
 
     # @tf.function(experimental_relax_shapes=True)
     def startTrain(self, numGames = 20000): # my method
-        wins = 0
-        ties = 0
-        misses = 0
+        # track how long it takes for each set of epochs and loop through numGames
         curr = time.time()
         for gameInd in range(numGames):
+            # initialize a new game for each training step and setup a tracker to track each state and associated move
             self.cg = game.Game()
             moveTracker = deque()
+            # keep playing the game unitl somebody wins
             while self.cg.winner() is None:
                 if self.cg.pTurn:
                     indexMove = self.neurMove()
                     moveTracker.appendleft((self.cg.compRead(), indexMove))
                 else:
-                    # Random availible for now but should maybe switch to q learner later
+                    # should maybe switch to q tabular learner later and see how it work out?
+                    # would learning be faster?
                     indexMove = random.choice(self.cg.possMoves())
                 ret = self.cg.play(indexMove)
-                if ret == 0:
+                if ret == 0: # if the choosen move was unplayable exit loop
                     break
             
-            self.feedReward(list(moveTracker))
+            self.feedReward(list(moveTracker)) # feed and back prop in the model
 
-            # moving training along
+            # update the console with stats for the current batch and shorten epsilon
             if (gameInd+1) % (numGames / 20) == 0:
                 print(f"{gameInd+1}/{numGames} games, epsilon={round(self.epsilon,2)}...completed in {round(time.time() - curr, 3)}s, L={round(self.avgLoss.result().numpy(), 5)}")
-                self.epsilon = max(0, self.epsilon - 0.05) # could also update discount factor # no epsilon change in training
+                self.epsilon = max(0, self.epsilon - 0.05) # could also update discount factor
                 curr = time.time()
                 self.avgLoss.reset_states()
 
-    # @tf.function(experimental_relax_shapes=True)
     def feedReward(self, moveTracker):
-        # reward = 0.0
-            win = self.cg.winner()
-            if win == None:
-                reward = 0.0
-            elif win == 1: #reward should be tweaked later
-                reward = 1.0
-            elif win ==  -1:
-                reward = 0.0
-            elif win == 0:
-                reward = 1.0
-            
-            # training
-            # targModel = tf.keras.models.clone_model(self.model) # should be fine to not reset the target model at the end
-            self.tempoModel.set_weights(self.model.get_weights()) 
+        # What should be reward for end state
+        win = self.cg.winner()
+        if win == None:
+            reward = 0.0
+        elif win == 1:
+            reward = 1.0
+        elif win ==  -1:
+            reward = 0.0
+        elif win == 0:
+            reward = 1.0
+        
+        # training
+        # create a temporary model to continue to get predictions
+        self.tempoModel.set_weights(self.model.get_weights()) 
 
-            next_position, move_index = moveTracker[0]
-            loss = self.backProp(next_position, move_index, reward)
-            self.avgLoss.update_state(loss)
-            for (position, move_index) in list(moveTracker)[1:] :
-                output = self.tempoModel.predict([binConv(next_position)]) # position should hold same formatting as binRead post conversion
-                qValue = tf.reduce_max(output) # what was the q value of the last move
-                loss = self.backProp(position, move_index, qValue * self.discountFac)
-                self.avgLoss.update_state(loss)
+        # update the model weights for each of the recorded states
+        next_position, move_index = moveTracker[0]
+        loss = self.backProp(next_position, move_index, reward)
+        self.avgLoss.update_state(loss)
+        for (position, move_index) in list(moveTracker)[1:] :
+            output = self.tempoModel.predict([binConv(next_position)]) # position should hold same formatting as binRead post conversion
+            qValue = tf.reduce_max(output) # what was the q value of the last move
+            loss = self.backProp(position, move_index, qValue * self.discountFac)
+            self.avgLoss.update_state(loss) # track the average loss for stats
 
-                next_position = position
+            next_position = position
 
     def record(self):
         print("started saving")

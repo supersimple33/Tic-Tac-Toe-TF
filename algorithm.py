@@ -54,8 +54,7 @@ class SmartGame(game.Game):
         self.play(bestMove)
 
     def __init__(self):
-        self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]] # -1, 0, 1 will represent x, blanks, and o
-        self.pTurn = False
+        super().__init__()
     # takes in the game as a argument. Returns how many losses
 
 
