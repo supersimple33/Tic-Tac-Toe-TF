@@ -17,10 +17,9 @@ class NeuralGame(game.Game):
         self.play(moves[0])
 
     def __init__(self):
+        super().__init__()
         model = tf.keras.models.load_model('saved_model/my_model')
         self.model = model
-        self.board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]] # -1, 0, 1 will represent x, blanks, and o
-        self.pTurn = False
     
     def versus(self):
         while self.winner() is None:
