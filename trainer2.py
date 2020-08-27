@@ -15,17 +15,22 @@ def binConv(compState):
     return [compState[0] == -1, compState[1] == -1, compState[2] == -1, compState[3] == -1, compState[4] == -1, compState[5] == -1, compState[6] == -1, compState[7] == -1, compState[8] == -1, compState[0] == 0, compState[1] == 0, compState[2] == 0, compState[3] == 0, compState[4] == 0, compState[5] == 0, compState[6] == 0, compState[7] == 0, compState[8] == 0, compState[0] == 1, compState[1] == 1, compState[2] == 1, compState[3] == 1, compState[4] == 1, compState[5] == 1, compState[6] == 1, compState[7] == 1, compState[8] == 1]
 
 class NeuralTic(): # my class # is () necessary/what does it do
-    def __init__(self, epsilon = 0.75, discountFac = 1.0):
+    def __init__(self, epsilon = 0.75, discountFac = 1.0, lr=0.1):
         self.cg = game.Game()
         self.model = tf.keras.Sequential([
             tf.keras.layers.Dense(36, activation='relu', input_shape=(27, )),
             tf.keras.layers.Dense(36, activation='relu'),
             tf.keras.layers.Dense(9, activation='sigmoid') #softmax alternate
         ])
-        self.opt = tf.keras.optimizers.SGD(learning_rate=0.1, name='SGD')
+        self.opt = tf.keras.optimizers.SGD(learning_rate=lr, name='SGD')
+        self.lossObj = tf.keras.losses.mean_squared_error
+
+        # self.model.build()
+        self.model.compile(optimizer=self.opt, loss=self.lossObj)
 
         self.epsilon = epsilon
         self.discountFac = discountFac
+        # self.train_step = tf.train.GradientDescentOptimizer(learning_rate=0.05).minimize(self.lossObj,name='train')
 
     def neurMove(self):
         if self.epsilon > 0:
@@ -38,19 +43,58 @@ class NeuralTic(): # my class # is () necessary/what does it do
         return max_move_index[0].numpy()
 
     def backProp(self, position, moveInd, target_value):
-        output = self.model.predict([binConv(position)])
-        target = copy.copy(output)[0] # switched to regular instead of deepcopy may cause mem errors
-        target[moveInd] = target_value
+        state = tf.convert_to_tensor([binConv(position)])
+        output = tf.Variable(self.model(state, training=True)[0], trainable=True)
+        target = copy.copy(output) # should it be deep
+        target[moveInd].assign(target_value)
         illegal_moves = []
         [illegal_moves.append(x) for x in [0,1,2,3,4,5,6,7,8] if position[x] != 0]
         for mi in illegal_moves:
-            target[mi] = 0.0
-        with tf.GradientTape() as tape:
-            loss = tf.keras.losses.mean_squared_error(target, output)
-        grads = tape.gradient(loss, self.model.trainable_variables) # linking?
-        # grads = [grad if grad is not None else tf.zeros_like(var) for var, grad in zip(self.model.trainable_variables, grads)] # silencer?
+            target[mi].assign(0.0)
 
-        self.opt.apply_gradients(zip(grads, self.model.trainable_variables))
+        met = self.model.train_on_batch(x=state, y=target)
+        return met
+
+    def backsProp(self, position, moveInd, target_value):
+        # x = tf.Variable(3.0)
+
+        # with tf.GradientTape() as tape:
+        #     y = x**2
+
+        # dy_dx = tape.gradient(y, x)
+
+        # output = self.model.predict([binConv(position)])[0] # cant use model.predict
+
+        state = tf.convert_to_tensor([binConv(position)])
+        output = tf.Variable(self.model(state, training=True)[0], trainable=True)
+        target = tf.Variable(output**2, trainable=True, name="Variable:1")
+
+        with tf.GradientTape() as tape:
+            # tape.watch(output)
+            # tape.watch(target)
+
+            # target[moveInd].assign(target_value)
+            # target[moveInd] = target_value
+            # illegal_moves = []
+            # [illegal_moves.append(x) for x in [0,1,2,3,4,5,6,7,8] if position[x] != 0]
+            # for mi in illegal_moves:
+            #     target[mi].assign(0.0)
+
+            # output = tf.convert_to_tensor(output)
+            # target = tf.convert_to_tensor(target)
+            # tape.watch(self.model.trainable_variables)
+            # gradientNames = ['dense/kernel:0', 'dense/bias:0', 'dense_1/kernel:0', 'dense_1/bias:0', 'dense_2/kernel:0', 'dense_2/bias:0']
+
+            loss = self.lossObj(y_true=target, y_pred=output)
+            tape.watch(self.model.trainable_variables)
+            tape.watch(loss)
+        grads = tape.gradient(loss, self.model.trainable_variables)
+        grads = tape.gradient(loss, self.model.trainable_variables, unconnected_gradients=tf.UnconnectedGradients.ZERO) # linking?
+        # grads = tf.distribute.get_replica_context().all_reduce('sum', grads) # why am i doing this
+        # grads = [grad if grad is not None else tf.zeros_like(var) for var, grad in zip(self.model.trainable_variables, grads)] # silencer?
+        application = zip(grads, self.model.trainable_variables)
+
+        self.opt.apply_gradients(application)
         return loss
 
     def startTrain(self, numGames = 20000): # my method
