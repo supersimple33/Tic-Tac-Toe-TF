@@ -42,18 +42,38 @@ class NeuralTic(): # my class # is () necessary/what does it do
         max_move_index = tf.argmax(q_values, 1)
         return max_move_index[0].numpy()
 
-    def backProp(self, position, moveInd, target_value):
+    # @tf.function
+    def vbackProp(self, position, moveInd, target_value):
         state = tf.convert_to_tensor([binConv(position)])
-        output = tf.Variable(self.model(state, training=True)[0], trainable=True)
-        target = copy.copy(output) # should it be deep
+        # target = tf.Variable(self.model(state, training=False)[0], trainable=False)
+        target = tf.Variable(self.model.predict_step(state)[0], trainable=False)
         target[moveInd].assign(target_value)
         illegal_moves = []
         [illegal_moves.append(x) for x in [0,1,2,3,4,5,6,7,8] if position[x] != 0]
         for mi in illegal_moves:
             target[mi].assign(0.0)
 
-        met = self.model.train_on_batch(x=state, y=target)
+        met = self.model.train_on_batch(x=state, y=tf.convert_to_tensor(target))
         return met
+
+    def backProp(self, position, moveInd, target_value):
+        feat = tf.convert_to_tensor([binConv(position)])
+
+        illegal_moves = []
+        [illegal_moves.append(float(position[x] == 0)) for x in [0,1,2,3,4,5,6,7,8]]
+        targetTens = tf.constant(illegal_moves)
+
+        loss, grads = self.backssProp(feat, targetTens)
+        return loss
+
+    @tf.function
+    def backssProp(self, features, labels):
+        with tf.GradientTape() as tape:
+            predictions = self.model(features)
+            loss = self.lossObj(labels, predictions)
+        gradients = tape.gradient(loss, self.model.trainable_variables)
+        self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
+        return loss, gradients
 
     def backsProp(self, position, moveInd, target_value):
         # x = tf.Variable(3.0)
@@ -66,30 +86,21 @@ class NeuralTic(): # my class # is () necessary/what does it do
         # output = self.model.predict([binConv(position)])[0] # cant use model.predict
 
         state = tf.convert_to_tensor([binConv(position)])
-        output = tf.Variable(self.model(state, training=True)[0], trainable=True)
-        target = tf.Variable(output**2, trainable=True, name="Variable:1")
+        output = self.model(state, training=True)[0]
+        # target[moveInd].assign(target_value)
+        # target[moveInd] = target_value
+        illegal_moves = []
+        [illegal_moves.append(float(position[x] == 0)) for x in [0,1,2,3,4,5,6,7,8]]
+        targetTens = tf.constant(illegal_moves)
 
         with tf.GradientTape() as tape:
-            # tape.watch(output)
-            # tape.watch(target)
+            result = output * targetTens
 
-            # target[moveInd].assign(target_value)
-            # target[moveInd] = target_value
-            # illegal_moves = []
-            # [illegal_moves.append(x) for x in [0,1,2,3,4,5,6,7,8] if position[x] != 0]
-            # for mi in illegal_moves:
-            #     target[mi].assign(0.0)
-
-            # output = tf.convert_to_tensor(output)
-            # target = tf.convert_to_tensor(target)
-            # tape.watch(self.model.trainable_variables)
-            # gradientNames = ['dense/kernel:0', 'dense/bias:0', 'dense_1/kernel:0', 'dense_1/bias:0', 'dense_2/kernel:0', 'dense_2/bias:0']
-
-            loss = self.lossObj(y_true=target, y_pred=output)
-            tape.watch(self.model.trainable_variables)
-            tape.watch(loss)
-        grads = tape.gradient(loss, self.model.trainable_variables)
-        grads = tape.gradient(loss, self.model.trainable_variables, unconnected_gradients=tf.UnconnectedGradients.ZERO) # linking?
+            loss = self.lossObj(y_true=result, y_pred=output)
+        # grads = tape.gradient(loss, self.model.trainable_variables)
+        grads = tape.gradient(loss,output)
+        print(grads)
+        # grads = tape.gradient(loss, self.model.trainable_variables, unconnected_gradients=tf.UnconnectedGradients.ZERO) # linking?
         # grads = tf.distribute.get_replica_context().all_reduce('sum', grads) # why am i doing this
         # grads = [grad if grad is not None else tf.zeros_like(var) for var, grad in zip(self.model.trainable_variables, grads)] # silencer?
         application = zip(grads, self.model.trainable_variables)
