@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 numpy = "*"
 tensorflow = "*"
+palettable = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.8"
