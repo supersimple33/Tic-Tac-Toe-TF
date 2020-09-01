@@ -118,3 +118,18 @@ class Game:
 	# returns a unique string linked to the current board state
 	def getHash(self):
 		return str(self.compRead())
+	
+	# Play a Player vs Player game
+	def versus(self):
+		while self.winner() is None:
+				if self.pTurn:
+					move = int(input("Where would you like to go O: "))
+					self.play(move)
+				else:
+					move = int(input("Where would you like to go X: "))
+					self.play(move)
+				print(self.normalDisplay())
+
+if __name__ == '__main__':
+	g = Game()
+	g.versus()
