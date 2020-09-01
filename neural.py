@@ -19,6 +19,7 @@ class NeuralGame(game.Game):
         super().__init__()
         model = tf.keras.models.load_model('saved_model/my_model')
         self.model = model
+        print(self.model.summary())
     
     def versus(self):
         while self.winner() is None:
