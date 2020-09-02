@@ -1,5 +1,6 @@
 # import tensorflow as tf
 # import numpy as np
+# Some code adapted from nestedsoftware.com/2019/07/25/tic-tac-toe-with-tabular-q-learning-1kdn.139811.html
 import pickle
 import game
 import random
