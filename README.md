@@ -1,6 +1,6 @@
 # Tic Tac Toe TF
 ![A Vissualization of the Neural Network](/brain.png)
-A representation of the model using jzliu-100's [repo](https://github.com/jzliu-100/visualize-neural-network). *You have to admit this neural network for is pretty beautiful.* 
+A representation of the model using jzliu-100's [repo](https://github.com/jzliu-100/visualize-neural-network). *You have to admit the vissualization of the neural network is pretty beautiful.* 
 ## What Is This
 Tic Tac Toe TF is a demonstration of ways that a computer may play tic tac toe against a player. It features methods for player vs player and player vs computer. The computer has a number of different strategies it uses featuring random play, algorithmic play, Q-Tabular play and Neural Network play. Faisal and I developed game.py and algorithm.py during the online coding 101 intensive course at Tufts for our project however I have heavily added to and redesigned the project since.
 ## Support
