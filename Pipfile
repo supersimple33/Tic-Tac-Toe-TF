@@ -4,12 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+palettable = "*"
+matplotlib = "*"
 
 [packages]
 numpy = "*"
 tensorflow = "*"
-palettable = "*"
-matplotlib = "*"
 
 [requires]
 python_version = "3.9"
